@@ -93,19 +93,29 @@ class InstagramScraper:
         
         return clicked
     
-    def extract_comments(self):
-        """Ekstraksi komentar dari postingan"""
-        print("\n--- Memulai Ekstraksi ---")
+    def extract_comments(self, max_comments=None):
+        """Ekstraksi HANYA komentar utama (tanpa reply)"""
+        print("\n--- Memulai Ekstraksi Komentar Utama ---")
         extracted_data = []
+        comment_count = 0
         
         try:
+            # Strategi: Ambil semua elemen span dengan dir='auto'
             comment_texts = self.driver.find_elements(By.CSS_SELECTOR, "span[dir='auto']")
             
             print(f"Deteksi awal: Ditemukan {len(comment_texts)} elemen teks potensial.")
+            
+            if max_comments:
+                print(f"Target: Mengambil maksimal {max_comments} komentar")
 
             for text_elem in comment_texts:
+                # BATASAN: Stop jika sudah mencapai max_comments
+                if max_comments and comment_count >= max_comments:
+                    print(f"\n✓ Batas maksimal {max_comments} komentar tercapai!")
+                    break
+                
                 try:
-                    text_content = text_elem.text
+                    text_content = text_elem.text.strip()
                     
                     # Filter: Komentar tidak kosong
                     if not text_content: 
@@ -114,27 +124,55 @@ class InstagramScraper:
                     # Mencari Parent Container
                     parent_container = text_elem.find_element(By.XPATH, "./../../..")
                     
+                    # FILTER: Skip jika ini adalah reply (balasan)
+                    # Reply biasanya berada di dalam nested <ul> atau memiliki indentasi
+                    try:
+                        # Cek apakah ada ancestor ul yang merupakan reply container
+                        reply_check = text_elem.find_element(By.XPATH, 
+                            "./ancestor::ul[contains(@style, 'padding') or contains(@class, 'repl')]"
+                        )
+                        # Jika ditemukan, skip (ini adalah reply)
+                        continue
+                    except:
+                        # Tidak ada ancestor reply container, ini komentar utama
+                        pass
+                    
                     # Cari Username di dalam parent container
                     try:
                         username_elem = parent_container.find_element(By.CSS_SELECTOR, "h3 a, div a")
-                        username = username_elem.text
+                        username = username_elem.text.strip()
                     except:
                         continue
 
-                    # Filter sampah (Tombol Reply/Like)
-                    if username == "" or "Reply" in username or "Suka" in username:
+                    # Filter username invalid
+                    if not username or username in ["Reply", "Suka", "Like", "View replies", "Lihat balasan", ""]:
                         continue
+                    
+                    # Ambil waktu posting (opsional)
+                    try:
+                        time_elem = parent_container.find_element(By.CSS_SELECTOR, "time")
+                        post_time = time_elem.get_attribute("datetime")
+                    except:
+                        post_time = ""
+                    
+                    # Increment nomor komentar
+                    comment_count += 1
                     
                     # Simpan data
                     data = {
+                        "No": comment_count,
                         "Username": username,
-                        "Komentar": text_content
+                        "Komentar": text_content,
+                        "Waktu": post_time
                     }
                     
                     # Cegah duplikat
                     if data not in extracted_data:
                         extracted_data.append(data)
-                        print(f"[V] {username}: {text_content[:30]}...")
+                        
+                        # Tampilkan preview yang lebih rapi
+                        preview = text_content[:60] + "..." if len(text_content) > 60 else text_content
+                        print(f"[{comment_count}] @{username}: {preview}")
 
                 except Exception as e:
                     continue
