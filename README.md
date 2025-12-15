@@ -23,7 +23,7 @@ Script Python untuk melakukan scraping (ekstraksi) komentar dari postingan Insta
 
 ### 1. Clone atau Download Project
 ```bash
-git clone https://github.com/hery2606/SCRAPER-DATA-KOMEN-IG-.git
+git clone https://github.com/hery2606/SCRAPING-DATA-KOMEN-IG-.git
 cd scraping
 ```
 
