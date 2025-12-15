@@ -1,6 +1,6 @@
 # Konfigurasi Login Instagram
-INSTAGRAM_USERNAME = "tugas_datmin"  
-INSTAGRAM_PASSWORD = "@Afif270505" 
+INSTAGRAM_USERNAME = "your_username_here"
+INSTAGRAM_PASSWORD = "your_password_here"
 
 # INSTAGRAM_USERNAME = "--"  
 # INSTAGRAM_PASSWORD = "--" 
