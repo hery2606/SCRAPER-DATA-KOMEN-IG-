@@ -132,10 +132,9 @@ Script akan menjalankan proses berikut secara otomatis:
    - Menyimpan hasil ke file `hasil_komentar_ig.csv`
    - Menampilkan preview data
 
-```
 ### 4. Output di Terminal
 Contoh output yang akan ditampilkan:
-
+```
 >>> Menyiapkan browser...
 >>> Memulai login otomatis...
 >>> Menunggu proses login...
@@ -176,10 +175,8 @@ Hasil scraping akan disimpan dalam file **hasil_komentar_ig.csv** dengan format:
 
 File CSV menggunakan encoding `utf-8-sig` agar dapat dibuka dengan baik di Microsoft Excel dan mendukung emoji.
 
-```
 ## Struktur Project
 ```
-
 scraping/
 ├── main.py                      # File utama untuk menjalankan program
 ├── scraper.py                   # Class untuk logic scraping
